@@ -4,8 +4,9 @@ var env = {};
 
 function interp(ast) {
   var result;
-  for (var i = 0; i < ast.es.length; ++i) {
-    result = ast.es[i].evaluate();
+  while (ast.es.length != 0) {
+    var expression = ast.es.shift();
+    result = expression.evaluate();
   }
   env = {};
   return result;
