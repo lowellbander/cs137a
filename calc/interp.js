@@ -1,8 +1,10 @@
 'use strict';
 
 function interp(ast) {
-  var expression = ast.es[0];
-  var result = expression.evaluate();
+  var result;
+  for (var i = 0; i < ast.es.length; ++i) {
+    result = ast.es[i].evaluate();
+  }
   return result;
 }
 
@@ -24,5 +26,9 @@ Mul.prototype.evaluate = function() {
 
 Div.prototype.evaluate = function() {
   return this.e1.evaluate() / this.e2.evaluate();
+}
+
+Pow.prototype.evaluate = function() {
+  return Math.pow(this.e1.evaluate(), this.e2.evaluate());
 }
 
