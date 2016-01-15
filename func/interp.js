@@ -38,3 +38,7 @@ BinOp.prototype.evaluate = function() {
   }
 }
 
+If.prototype.evaluate = function() {
+  return this.e1.evaluate() ? this.e2.evaluate() : this.e3.evaluate();
+}
+
