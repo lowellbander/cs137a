@@ -26,14 +26,39 @@ tests(
     expected: true
   },
   {
-    name: 'arithmetic and relational operators should require args to be numbers',
-    code: '(fun x -> x) + 1',
-    shouldThrow: true
+    name: 'greater than',
+    code: '6 > 7',
+    expected: false
+  },
+  {
+    name: 'and',
+    code: 'true && false',
+    expected: false
   },
   {
     name: 'or',
     code: 'true || false',
     expected: true
+  },
+  {
+    name: 'equal',
+    code: 'true = false',
+    expected: false
+  },
+  {
+    name: 'not equal',
+    code: 'true != false',
+    expected: true
+  },
+  {
+    name: 'modulo',
+    code: '3 % 2',
+    expected: 1
+  },
+  {
+    name: 'arithmetic and relational operators should require args to be numbers',
+    code: '(fun x -> x) + 1',
+    shouldThrow: true
   },
   {
     name: 'boolean operators should require args to be booleans',

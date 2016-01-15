@@ -9,19 +9,30 @@ Val.prototype.evaluate = function() {
 }
 
 BinOp.prototype.evaluate = function() {
+  debugger;
   switch (this.op) {
     case '*':
-      var result = this.e1.evaluate() * this.e2.evaluate();
-      return result;
+      return this.e1.evaluate() * this.e2.evaluate();
     case '+':
-      var result = this.e1.evaluate() + this.e2.evaluate();
-      return result;
+      return this.e1.evaluate() + this.e2.evaluate();
     case '-':
-      var result = this.e1.evaluate() - this.e2.evaluate();
-      return result;
+      return this.e1.evaluate() - this.e2.evaluate();
     case '/':
-      var result = this.e1.evaluate() / this.e2.evaluate();
-      return result;
+      return this.e1.evaluate() / this.e2.evaluate();
+    case '<':
+      return this.e1.evaluate() < this.e2.evaluate();
+    case '>':
+      return this.e1.evaluate() > this.e2.evaluate();
+    case '=':
+      return this.e1.evaluate() === this.e2.evaluate();
+    case '!=':
+      return this.e1.evaluate() !== this.e2.evaluate();
+    case '||':
+      return this.e1.evaluate() || this.e2.evaluate();
+    case '&&':
+      return this.e1.evaluate() && this.e2.evaluate();
+    case '%':
+      return this.e1.evaluate() % this.e2.evaluate();
     default:
       throw "unidentified binomial operator";
   }
