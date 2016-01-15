@@ -1,11 +1,13 @@
 'use strict';
 
-function interp(ast) {
-  return ast.evaluate();
-}
-
 // env is a stack of assignments
 var env = [];
+
+function interp(ast) {
+  var result = ast.evaluate();
+  env = [];
+  return result;
+}
 
 Let.prototype.evaluate = function() {
   var frame = {};
@@ -15,12 +17,13 @@ Let.prototype.evaluate = function() {
 }
 
 Var.prototype.evaluate = function() {
-  // find the value in the stack and return it;
+  // find the value in the stack and return it if it exists
   for (var i = env.length - 1; i >= 0; --i) {
     if (this.x in env[i]) {
       return env[i][this.x];
     }
   }
+  throw "undefined variable";
 }
 
 Val.prototype.evaluate = function() {
@@ -28,7 +31,6 @@ Val.prototype.evaluate = function() {
 }
 
 BinOp.prototype.evaluate = function() {
-  debugger;
   switch (this.op) {
     case '*':
       return this.e1.evaluate() * this.e2.evaluate();
