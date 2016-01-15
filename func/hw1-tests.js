@@ -6,6 +6,21 @@ tests(
     expected: 42
   },
   {
+    name: 'plus',
+    code: '6 + 7',
+    expected: 13
+  },
+  {
+    name: 'minus',
+    code: '6 - 7',
+    expected: -1
+  },
+  {
+    name: 'divide',
+    code: '6 / 7',
+    expected: 0.8571428571428571
+  },
+  {
     name: 'less than',
     code: '6 < 7',
     expected: true
