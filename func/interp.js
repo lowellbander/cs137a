@@ -13,7 +13,9 @@ Let.prototype.evaluate = function() {
   var frame = {};
   frame[this.x] = this.e1.evaluate();
   env.push(frame);
-  return this.e2.evaluate();
+  var result = this.e2.evaluate();
+  env.pop();
+  return result;
 }
 
 Var.prototype.evaluate = function() {
