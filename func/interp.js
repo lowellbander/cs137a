@@ -25,7 +25,7 @@ Var.prototype.evaluate = function() {
       return env[i][this.x];
     }
   }
-  throw "undefined variable";
+  throw "undefined variable:" + this.x;
 }
 
 Val.prototype.evaluate = function() {
