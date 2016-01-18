@@ -25,7 +25,27 @@ Var.prototype.evaluate = function() {
       return env[i][this.x];
     }
   }
-  throw "undefined variable:" + this.x;
+  throw "undefined variable: " + this.x;
+}
+
+Fun.prototype.evaluate = function() {
+  debugger;
+  return {
+    xs: this.xs,
+    e: this.e,
+  };
+}
+
+Call.prototype.evaluate = function() {
+  var fun = this.ef.evaluate();
+  var frame = {};
+  for (var i = 0; i < fun.xs.length; ++i) {
+    frame[fun.xs[i]] = this.es[i].evaluate();
+  }
+  env.push(frame);
+  var result = fun.e.evaluate();
+  env.pop();
+  return result;
 }
 
 Val.prototype.evaluate = function() {
