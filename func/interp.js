@@ -38,6 +38,9 @@ Fun.prototype.evaluate = function() {
 
 Call.prototype.evaluate = function() {
   var fun = this.ef.evaluate();
+  if (this.es.length > fun.xs.length) {
+    throw "passed too many args to function";
+  }
   var frame = {};
   for (var i = 0; i < fun.xs.length; ++i) {
     frame[fun.xs[i]] = this.es[i].evaluate();
