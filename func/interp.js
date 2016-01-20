@@ -56,29 +56,56 @@ Val.prototype.evaluate = function() {
 }
 
 BinOp.prototype.evaluate = function() {
+
+  var e1 = this.e1.evaluate();
+  var e2 = this.e2.evaluate();
+
   switch (this.op) {
     case '*':
-      return this.e1.evaluate() * this.e2.evaluate();
     case '+':
-      return this.e1.evaluate() + this.e2.evaluate();
     case '-':
-      return this.e1.evaluate() - this.e2.evaluate();
     case '/':
-      return this.e1.evaluate() / this.e2.evaluate();
     case '<':
-      return this.e1.evaluate() < this.e2.evaluate();
     case '>':
-      return this.e1.evaluate() > this.e2.evaluate();
     case '=':
-      return this.e1.evaluate() === this.e2.evaluate();
     case '!=':
-      return this.e1.evaluate() !== this.e2.evaluate();
-    case '||':
-      return this.e1.evaluate() || this.e2.evaluate();
-    case '&&':
-      return this.e1.evaluate() && this.e2.evaluate();
     case '%':
-      return this.e1.evaluate() % this.e2.evaluate();
+      if (typeof e1 !== 'number' ||
+          typeof e2 !== 'number') {
+	throw "args to arithmetic and relational operators must be numbers"
+      }
+      break;
+    case '||':
+    case '&&':
+      if (typeof e1 !== 'boolean' ||
+          typeof e2 !== 'boolean') {
+	throw "args to arithmetic and relational operators must be numbers"
+      }
+  }
+
+  switch (this.op) {
+    case '*':
+      return e1 * e2;
+    case '+':
+      return e1 + e2;
+    case '-':
+      return e1 - e2;
+    case '/':
+      return e1 / e2;
+    case '<':
+      return e1 < e2;
+    case '>':
+      return e1 > e2;
+    case '=':
+      return e1 === e2;
+    case '!=':
+      return e1 !== e2;
+    case '||':
+      return e1 || e2;
+    case '&&':
+      return e1 && e2;
+    case '%':
+      return e1 % e2;
     default:
       throw "unidentified binomial operator";
   }

@@ -42,12 +42,12 @@ tests(
   },
   {
     name: 'equal',
-    code: 'true = false',
+    code: '1 = 2',
     expected: false
   },
   {
     name: 'not equal',
-    code: 'true != false',
+    code: '1 != 2',
     expected: true
   },
   {
