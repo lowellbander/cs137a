@@ -67,8 +67,6 @@ BinOp.prototype.evaluate = function() {
     case '/':
     case '<':
     case '>':
-    case '=':
-    case '!=':
     case '%':
       if (typeof e1 !== 'number' ||
           typeof e2 !== 'number') {
