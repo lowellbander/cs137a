@@ -11,8 +11,12 @@ function interp(ast) {
 
 Let.prototype.evaluate = function() {
   var frame = {};
-  frame[this.x] = this.e1.evaluate();
+  var e1 = this.e1.evaluate();
+  frame[this.x] = e1;
   env.push(frame);
+  if (e1 instanceof Closure) {
+    env.push(e1.env);
+  }
   var result = this.e2.evaluate();
   env.pop();
   return result;
@@ -29,7 +33,6 @@ Var.prototype.evaluate = function() {
 }
 
 Fun.prototype.evaluate = function() {
-  debugger;
   return {
     xs: this.xs,
     e: this.e,
@@ -45,10 +48,26 @@ Call.prototype.evaluate = function() {
   for (var i = 0; i < fun.xs.length; ++i) {
     frame[fun.xs[i]] = this.es[i].evaluate();
   }
-  env.push(frame);
-  var result = fun.e.evaluate();
-  env.pop();
-  return result;
+  if (fun.e instanceof Fun) {
+    var innerFun = fun.e;
+    return new Closure(
+      innerFun.xs,
+      innerFun.e,
+      frame
+    );
+  } else {
+    env.push(frame);
+    if (fun instanceof Closure) {
+      env.push(fun.env);
+    }
+    var result = fun.e.evaluate();
+    env.pop();
+    return result;
+  }
+}
+
+Closure.prototype.evaluate = function() {
+  throw "Closure evaluation not yet implemented"
 }
 
 Val.prototype.evaluate = function() {
