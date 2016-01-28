@@ -39,6 +39,14 @@ Fun.prototype.evaluate = function() {
   };
 }
 
+Datum.prototype.evaluate = function() {
+  //debugger;
+  var members = [];
+  this.es.forEach(e => members.push(e.evaluate()));
+  this.es = members;
+  return this;
+}
+
 Call.prototype.evaluate = function() {
   var fun = this.ef.evaluate();
   if (this.es.length > fun.xs.length) {
