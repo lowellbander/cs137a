@@ -140,3 +140,46 @@ If.prototype.evaluate = function() {
   return this.e1.evaluate() ? this.e2.evaluate() : this.e3.evaluate();
 }
 
+var first = function(arr) {
+  if (!(arr instanceof Array)) {throw "arr must be an array";}
+  return (arr.length === 0) ? null : arr[0];
+}
+
+var second = function(arr) {
+  if (!(arr instanceof Array)) throw "arr must be an array";
+  if (arr.length < 2) throw "second must be called on an array of length >= 2";
+  return (arr.length < 2) ? null : arr[1];
+}
+
+var rest = function(arr) {
+  return arr.slice(1);
+}
+
+var consToArray = function(cons) {
+  return (cons.C === "Nil")
+    ? []
+    : [first(cons.es)].concat(consToArray(second(cons.es)));
+}
+
+var arrayToCons = function(arr) {
+  return (arr.length === 0)
+    ? new Datum("Nil", [])
+    : new Datum("Cons", [first(arr), arrayToCons(rest(arr))]);
+};
+
+var assign = function(name, value) {
+  var frame = {};
+  frame[name] = value;
+  env.push(frame);
+}
+
+ListComp.prototype.evaluate = function() {
+  var elist = consToArray(this.elist.evaluate());
+  var values = [];
+  elist.forEach(function(element) {
+    assign(this.x, element);
+    values.push(this.e.evaluate());
+  }, this);
+  return arrayToCons(values);
+}
+
