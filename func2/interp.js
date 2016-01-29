@@ -178,6 +178,9 @@ ListComp.prototype.evaluate = function() {
   var values = [];
   elist.forEach(function(element) {
     assign(this.x, element);
+    if (typeof this.epred !== 'undefined' && !this.epred.evaluate()) {
+      return;
+    }
     values.push(this.e.evaluate());
   }, this);
   return arrayToCons(values);
