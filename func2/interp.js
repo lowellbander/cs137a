@@ -195,25 +195,26 @@ var match = function(expression, pattern) {
 
     if (pattern instanceof Val) {
       debugger;
-      return (expression.evaluate() === pattern.evaluate())
+      return (expression === pattern.evaluate())
         ? bindings
         : null;
     } else if (pattern instanceof Wildcard) {
       return bindings;
     } else if (pattern instanceof Var) {
       debugger;
-      assign(pattern.x, expression.evaluate());
+      var value = (expression instanceof AST)
+        ? expression.evaluate()
+        : expression;
+      bindings[pattern.x] = value;
       return bindings;
     } else if (pattern instanceof Datum) {
+      debugger;
       if (!(expression instanceof Datum)) {
         return null;
       }
-      debugger;
     } else {
-      debugger;
       throw "unhandled or dissimilar data type in match";
     }
-
   }
   return match_aux(expression, pattern, {});
 }
@@ -229,14 +230,14 @@ Match.prototype.evaluate = function() {
   // throw if none match?
 
   for (var i = 0; i < this.ps.length; ++i) {
-    var expression = this.e;
+    var expression = (this.e instanceof Var)
+      ? this.e.evaluate()
+      : this.e;
     var pattern = this.ps[i]
     var bindings = match(expression, pattern);
     if (bindings !== null) {
-      debugger;
-      assign(bindings);
+      env.push(bindings);
       return this.es[i].evaluate();
-      //return "matched!"
     }
   }
   throw "match failure";

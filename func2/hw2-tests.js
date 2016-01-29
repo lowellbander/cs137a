@@ -40,6 +40,11 @@ tests(
     expected: 3
   },
   {
+    name: 'match w/ let',
+    code: 'let foo = 6 in match foo with bar -> bar',
+    expected: 6
+  },
+  {
     name: 'match failure should throw exception',
     code: 'match 5 with 6 -> 42',
     shouldThrow: true
