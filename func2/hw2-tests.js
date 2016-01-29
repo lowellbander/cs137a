@@ -35,6 +35,11 @@ tests(
     expected: 42
   },
   {
+    name: 'match var',
+    code: 'match 3 with foo -> foo',
+    expected: 3
+  },
+  {
     name: 'match failure should throw exception',
     code: 'match 5 with 6 -> 42',
     shouldThrow: true

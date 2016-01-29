@@ -186,3 +186,59 @@ ListComp.prototype.evaluate = function() {
   return arrayToCons(values);
 }
 
+var match = function(expression, pattern) {
+  //debugger;
+  var match_aux = function(expression, pattern, bindings) {
+    // check the types
+    // if they match, return the object of total bindings
+    // else, return null(?)
+
+    if (pattern instanceof Val) {
+      debugger;
+      return (expression.evaluate() === pattern.evaluate())
+        ? bindings
+        : null;
+    } else if (pattern instanceof Wildcard) {
+      return bindings;
+    } else if (pattern instanceof Var) {
+      debugger;
+      assign(pattern.x, expression.evaluate());
+      return bindings;
+    } else if (pattern instanceof Datum) {
+      if (!(expression instanceof Datum)) {
+        return null;
+      }
+      debugger;
+    } else {
+      debugger;
+      throw "unhandled or dissimilar data type in match";
+    }
+
+  }
+  return match_aux(expression, pattern, {});
+}
+
+Match.prototype.evaluate = function() {
+  //debugger;
+  // iterate through all patterns,
+  // foreach pattern, check to see if all the datatypes are the same
+  // for each one that is, add it to a list of bindings
+  //    unless it's a wildcard, in which case keep ignore it & keep going
+  // if you get to the end, then evaluate the corresponding e w/ bindings
+  // else clear bindings and try next pattern
+  // throw if none match?
+
+  for (var i = 0; i < this.ps.length; ++i) {
+    var expression = this.e;
+    var pattern = this.ps[i]
+    var bindings = match(expression, pattern);
+    if (bindings !== null) {
+      debugger;
+      assign(bindings);
+      return this.es[i].evaluate();
+      //return "matched!"
+    }
+  }
+  throw "match failure";
+}
+
