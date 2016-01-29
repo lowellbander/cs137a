@@ -2,7 +2,27 @@
 
 function match(value, ...theArgs /* pat1, fun1, pat2, fun2, ... */) {
   var patFuns = toPatFuns(theArgs);
-  debugger;
+  for (var i = 0; i < patFuns.length; ++i) {
+    var patFun = patFuns[i];
+    var bindings = doMatch(value, patFun.pat);
+    if (bindings !== null) {
+      return patFun.fun(...bindings);
+    }
+  }
+  throw "match failed";
+}
+
+function doMatch(value, pattern) {
+  function doMatch_aux(value, pattern, bindings) {
+    if (pattern === _) {
+      var newBindings = bindings.slice();
+      newBindings.push(value);
+      return newBindings;
+    } else {
+      throw "unhandled pattern";
+    }
+  }
+  return doMatch_aux(value, pattern, []);
 }
 
 function first(arr) {
@@ -40,4 +60,6 @@ class PatFun {
     this.fun = fun;
   }
 }
+
+var _ = "wildcard";
 
