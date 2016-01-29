@@ -18,11 +18,25 @@ function doMatch(value, pattern) {
       var newBindings = bindings.slice();
       newBindings.push(value);
       return newBindings;
+    } else if (pattern instanceof Array) {
+      throw "matching on Arrays not yet implemented";
+    } else if (pattern instanceof Function) {
+      throw "matching on Functions not yet implemented";
     } else {
-      throw "unhandled pattern";
+      // assume pattern is literal
+      return (value === pattern)
+        ? bindings
+        : null;
     }
   }
   return doMatch_aux(value, pattern, []);
+}
+
+function functionName(fun) {
+  var ret = fun.toString();
+  ret = ret.substr('function '.length);
+  ret = ret.substr(0, ret.indexOf('('));
+  return ret;
 }
 
 function first(arr) {
