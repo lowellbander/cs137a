@@ -19,7 +19,11 @@ function doMatch(value, pattern) {
       newBindings.push(value);
       return newBindings;
     } else if (pattern instanceof Array) {
-      throw "matching on Arrays not yet implemented";
+      if (!(value instanceof Array)) return null;
+      if (value.length === 0 && pattern.length === 0) return bindings;
+      var firstBindings = doMatch_aux(first(value), first(pattern), bindings);
+      if (firstBindings === null) return null;
+      return doMatch_aux(rest(value), rest(pattern), firstBindings);
     } else if (pattern instanceof Function) {
       throw "matching on Functions not yet implemented";
     } else {
