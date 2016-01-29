@@ -40,7 +40,6 @@ Fun.prototype.evaluate = function() {
 }
 
 Datum.prototype.evaluate = function() {
-  //debugger;
   var members = [];
   this.es.forEach(e => members.push(e.evaluate()));
   this.es = members;
@@ -187,40 +186,46 @@ ListComp.prototype.evaluate = function() {
 }
 
 var match = function(expression, pattern) {
-  //debugger;
   var match_aux = function(expression, pattern, bindings) {
     // check the types
     // if they match, return the object of total bindings
-    // else, return null(?)
-
+    // else, return null
+    debugger;
     if (pattern instanceof Val) {
-      debugger;
       return (expression === pattern.evaluate())
         ? bindings
         : null;
     } else if (pattern instanceof Wildcard) {
       return bindings;
     } else if (pattern instanceof Var) {
-      debugger;
       var value = (expression instanceof AST)
         ? expression.evaluate()
         : expression;
       bindings[pattern.x] = value;
       return bindings;
     } else if (pattern instanceof Datum) {
-      debugger;
-      if (!(expression instanceof Datum)) {
-        return null;
-      }
+      if (!(expression instanceof Datum)) return null;
+      if (pattern.C !== expression.C) return null;
+      if (pattern.es.length === 0 && expression.es.length === 0)
+        return bindings;
+
+      var C = pattern.C;
+      var carExpression = first(expression.es);
+      var carPattern = first(pattern.es);
+      bindings = match_aux(carExpression, carPattern, bindings);
+      if (bindings === null) return null;
+
+      var cdrExpression = new Datum(C, rest(expression.es));
+      var cdrPattern = new Datum(C, rest(pattern.es));
+      return match_aux(cdrExpression, cdrPattern, bindings);
     } else {
-      throw "unhandled or dissimilar data type in match";
+      throw "unhandled data type in match";
     }
   }
   return match_aux(expression, pattern, {});
 }
 
 Match.prototype.evaluate = function() {
-  //debugger;
   // iterate through all patterns,
   // foreach pattern, check to see if all the datatypes are the same
   // for each one that is, add it to a list of bindings
