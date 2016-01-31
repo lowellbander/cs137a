@@ -19,6 +19,9 @@ function match(value, ...theArgs /* pat1, fun1, pat2, fun2, ... */) {
     var patFun = patFuns[i];
     var bindings = doMatch(value, patFun.pat);
     if (bindings !== null) {
+      if (bindings.length !== patFun.fun.length)
+        throw "arity mismatch: expected " + bindings.length
+          + " but got " + patFun.fun.length;
       return patFun.fun(...bindings);
     }
   }

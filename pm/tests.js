@@ -45,6 +45,14 @@ tests(JS,
     expected: 125
   },
   {
+    name: 'arity',
+    code: 'match([123],\n' +
+          '  [_,_],\n' +
+          '   x => x + 2\n' +
+          ')',
+    shouldThrow: true
+  },
+  {
     name: 'literal pattern',
     code: 'match(123,\n' +
           '  42,\n' +
