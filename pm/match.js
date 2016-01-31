@@ -1,5 +1,12 @@
 'use strict';
 
+function pred(predicate) {
+  return {
+    type: 'predicate',
+    predicate: predicate,
+  };
+}
+
 function match(value, ...theArgs /* pat1, fun1, pat2, fun2, ... */) {
   var patFuns = toPatFuns(theArgs);
   for (var i = 0; i < patFuns.length; ++i) {
@@ -15,17 +22,22 @@ function match(value, ...theArgs /* pat1, fun1, pat2, fun2, ... */) {
 function doMatch(value, pattern) {
   function doMatch_aux(value, pattern, bindings) {
     if (pattern === _) {
-      var newBindings = bindings.slice();
-      newBindings.push(value);
-      return newBindings;
+      return bindings.concat(value);
     } else if (pattern instanceof Array) {
       if (!(value instanceof Array)) return null;
       if (value.length === 0 && pattern.length === 0) return bindings;
       var firstBindings = doMatch_aux(first(value), first(pattern), bindings);
       if (firstBindings === null) return null;
       return doMatch_aux(rest(value), rest(pattern), firstBindings);
-    } else if (pattern instanceof Function) {
-      throw "matching on Functions not yet implemented";
+    } else if (pattern instanceof Object && 'type' in pattern) {
+      switch (pattern.type) {
+        case 'predicate':
+          return pattern.predicate(value)
+            ? bindings.concat(value)
+            : null;
+        default:
+          throw "bad fun type: " + pattern.type;
+      }
     } else {
       // assume pattern is literal
       return (value === pattern)
@@ -65,8 +77,10 @@ function toPatFuns(l) {
     if (l.length === 0)
       return accumulator;
     else {
-      accumulator.push(new PatFun(first(l), second(l)));
-      return toPatFuns_aux(rest(rest(l)), accumulator);
+      return toPatFuns_aux(
+        rest(rest(l)),
+        accumulator.concat(new PatFun(first(l), second(l)))
+      );
     }
   }
   return toPatFuns_aux(l, []);
