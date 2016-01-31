@@ -7,8 +7,12 @@ function pred(predicate) {
   };
 }
 
-function instof(classname, ...pattern) {
-  debugger;
+function instof(c, ...pattern) {
+  return {
+    type: 'instance',
+    class: c,
+    pattern: pattern,
+  };
 }
 
 Object.prototype.deconstruct = () => ([]);
@@ -44,6 +48,14 @@ function doMatch(value, pattern) {
           return pattern.predicate(value)
             ? bindings.concat(value)
             : null;
+        case 'instance':
+          var classBindings = doMatch(
+            pattern.class.prototype.deconstruct.call(value),
+            pattern.pattern
+          );
+          return (classBindings === null)
+            ? null
+            : bindings.concat(classBindings);
         default:
           throw "bad fun type: " + pattern.type;
       }
