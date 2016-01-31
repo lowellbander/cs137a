@@ -7,6 +7,12 @@ function pred(predicate) {
   };
 }
 
+function instof(classname, ...pattern) {
+  debugger;
+}
+
+Object.prototype.deconstruct = () => ([]);
+
 function match(value, ...theArgs /* pat1, fun1, pat2, fun2, ... */) {
   var patFuns = toPatFuns(theArgs);
   for (var i = 0; i < patFuns.length; ++i) {
