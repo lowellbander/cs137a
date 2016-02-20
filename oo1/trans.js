@@ -6,7 +6,16 @@ function trans(ast) {
 }
 
 Program.prototype.trans = function() {
-  return this.ss.map(statement => statement.trans()).join('\n');
+  var statements = this.ss.map(statement => statement.trans()).join('\n');
+
+  function last(arr) {
+    if (!(arr instanceof Array)) throw "last expects an array";
+    return (arr.length === 0) ? null : arr[arr.length - 1];
+  }
+
+  if (!(last(this.ss) instanceof ExpStmt)) statements += "null;";
+
+  return statements;
 }
 
 ExpStmt.prototype.trans = function() {
@@ -19,5 +28,9 @@ BinOp.prototype.trans = function() {
 
 Lit.prototype.trans = function() {
   return this.primValue.toString();
+}
+
+VarDecl.prototype.trans = function() {
+  return "var " + this.x + " = " + this.e.trans() + ";";
 }
 
