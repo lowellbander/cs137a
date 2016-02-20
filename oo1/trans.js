@@ -34,3 +34,7 @@ VarDecl.prototype.trans = function() {
   return "var " + this.x + " = " + this.e.trans() + ";";
 }
 
+Var.prototype.trans = function() {
+  return this.x;
+}
+
