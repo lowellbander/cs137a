@@ -14,7 +14,7 @@ ExpStmt.prototype.trans = function() {
 }
 
 BinOp.prototype.trans = function() {
-  return this.e1.trans() + " " + this.op + " " + this.e2.trans();
+  return "(" + this.e1.trans() + " " + this.op + " " + this.e2.trans() + ")";
 }
 
 Lit.prototype.trans = function() {
