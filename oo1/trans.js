@@ -1,11 +1,29 @@
 'use strict';
 
+var classes = {};
+
+class Class {
+  constructor(C, members) {
+    if (!(typeof C === "string")) throw "classname must be string";
+    if (!Array.isArray(members)) throw "members must be an array";
+    for (var m in members) {
+      if (!(typeof m === "string")) throw "members must be an array of strings";
+    }
+
+    this.C = C;
+    this.members = members;
+  }
+}
+
+classes.Obj = new Class("Obj", []);
+
 function trans(ast) {
   return ast.trans();
 }
 
 Program.prototype.trans = function() {
   var statements = "function Obj() {};\n"
+    + "Obj.prototype.init = () => {}\n";
   statements += this.ss.map(statement => statement.trans()).join('\n');
 
   function last(arr) {
@@ -27,7 +45,9 @@ BinOp.prototype.trans = function() {
 }
 
 Lit.prototype.trans = function() {
-  return this.primValue.toString();
+  return (typeof this.primValue === "string")
+    ? "\"" + this.primValue + "\""
+    : this.primValue.toString();
 }
 
 VarDecl.prototype.trans = function() {
@@ -40,7 +60,16 @@ Var.prototype.trans = function() {
 
 MethodDecl.prototype.trans = function() {
   return this.C + ".prototype." + this.m + " = (" + this.xs.join(", ")
-    + ") => {" + this.ss.map(s => s.trans()).join("\n") + "};";
+    + ") => {" + this.ss.map(s => s.trans()).join("\n")
+    + ((this.m === "init") ? "return this;\n" : "") + "};";
+}
+
+ClassDecl.prototype.trans = function() {
+  var superProperties = classes[this.S].members;
+  var ownProperties = this.xs.filter(x => !(superProperties.includes(x)));
+  return "function " + this.C + "("
+    + superProperties.concat(ownProperties).join(", ") + ") {\n"
+    + this.xs.map(x => "this." + x + " = " + x + ";\n").join("") + "}";
 }
 
 Return.prototype.trans = function() {
@@ -48,11 +77,20 @@ Return.prototype.trans = function() {
 }
 
 New.prototype.trans = function() {
-  return "(new " + this.C + "(" + this.es.map(e => e.trans()).join(", ") + "))";
+  return "(() => {var foo = new " + this.C + "(); foo.init("
+    + this.es.map(e => e.trans()).join(", ") +"); return foo;})()"
 }
 
 Send.prototype.trans = function() {
   return this.erecv.trans() + "." + this.m
     + "(" + this.es.map(s=>s.trans()).join(", ") + ")";
+}
+
+InstVarAssign.prototype.trans = function() {
+  return "this." + this.x + " = " + this.e.trans() + ";";
+}
+
+InstVar.prototype.trans = function() {
+  return "this." + this.x;
 }
 
