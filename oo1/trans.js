@@ -88,6 +88,9 @@ InstVarAssign.prototype.trans = function() {
 }
 
 InstVar.prototype.trans = function() {
-  return "this.m_" + this.x;
+  // TODO: verify this check actually works
+  return "((\"m_" + this.x + "\" in this) "
+    + "? this.m_" + this.x
+    + " : (() => {throw \"accessing non-existent var\";})())";
 }
 
