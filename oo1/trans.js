@@ -22,6 +22,10 @@ function addClass(classname, superclass, members) {
   classes[classname] = newClass;
 }
 
+function getSuper(classname) {
+  return classes[classname].superclass;
+}
+
 addClass("Obj", "Obj", [])
 
 function trans(ast) {
@@ -73,14 +77,10 @@ MethodDecl.prototype.trans = function() {
 ClassDecl.prototype.trans = function() {
   // var superProperties = classes[this.S].members;
   // var ownProperties = this.xs.filter(x => !(superProperties.includes(x)));
-  // TODO: if this.m === init, call parent's init with "this" bound to the
-  // new object i've just created
 
-  // TODO: add class to hierarchy
   addClass(this.C, this.S, this.xs);
-  debugger;
-
-  return "function " + this.C + "() {};";
+  return "function " + this.C + "() {}; " +
+    this.C + ".prototype = Object.create(" + this.S + ".prototype);";
 }
 
 Return.prototype.trans = function() {
@@ -88,12 +88,6 @@ Return.prototype.trans = function() {
 }
 
 New.prototype.trans = function() {
-  // TODO: instead of calling new, call Object.create(superclass)
-  //var superclass = getSuper(this.C);
-  //var s = "(() => {";
-  //s += () "var foo = new " + this.C + "();" +
-  //  + "foo.init(" + this.es.map(e => e.trans()).join(", ") +"); return foo;})()"
-
   return "(() => {var foo = new " + this.C + "(); foo.init("
     + this.es.map(e => e.trans()).join(", ") +"); return foo;})()"
 }
@@ -108,7 +102,6 @@ InstVarAssign.prototype.trans = function() {
 }
 
 InstVar.prototype.trans = function() {
-  // TODO: verify this check actually works
   return "((\"m_" + this.x + "\" in this) "
     + "? this.m_" + this.x
     + " : (() => {throw \"accessing non-existent var\";})())";
