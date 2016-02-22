@@ -3,19 +3,26 @@
 var classes = {};
 
 class Class {
-  constructor(C, members) {
-    if (!(typeof C === "string")) throw "classname must be string";
+  constructor(classname, superclass, members) {
+    if (!(typeof classname === "string")) throw "classname must be string";
+    if (!(typeof superclass === "string")) throw "superclass must be string";
     if (!Array.isArray(members)) throw "members must be an array";
     for (var m in members) {
       if (!(typeof m === "string")) throw "members must be an array of strings";
     }
 
-    this.C = C;
+    this.classname = classname;
+    this.superclass = superclass;
     this.members = members;
   }
 }
 
-classes.Obj = new Class("Obj", []);
+function addClass(classname, superclass, members) {
+  var newClass = new Class(classname, superclass, members);
+  classes[classname] = newClass;
+}
+
+addClass("Obj", "Obj", [])
 
 function trans(ast) {
   return ast.trans();
@@ -64,8 +71,15 @@ MethodDecl.prototype.trans = function() {
 }
 
 ClassDecl.prototype.trans = function() {
- // var superProperties = classes[this.S].members;
- // var ownProperties = this.xs.filter(x => !(superProperties.includes(x)));
+  // var superProperties = classes[this.S].members;
+  // var ownProperties = this.xs.filter(x => !(superProperties.includes(x)));
+  // TODO: if this.m === init, call parent's init with "this" bound to the
+  // new object i've just created
+
+  // TODO: add class to hierarchy
+  addClass(this.C, this.S, this.xs);
+  debugger;
+
   return "function " + this.C + "() {};";
 }
 
@@ -74,6 +88,12 @@ Return.prototype.trans = function() {
 }
 
 New.prototype.trans = function() {
+  // TODO: instead of calling new, call Object.create(superclass)
+  //var superclass = getSuper(this.C);
+  //var s = "(() => {";
+  //s += () "var foo = new " + this.C + "();" +
+  //  + "foo.init(" + this.es.map(e => e.trans()).join(", ") +"); return foo;})()"
+
   return "(() => {var foo = new " + this.C + "(); foo.init("
     + this.es.map(e => e.trans()).join(", ") +"); return foo;})()"
 }
@@ -92,5 +112,9 @@ InstVar.prototype.trans = function() {
   return "((\"m_" + this.x + "\" in this) "
     + "? this.m_" + this.x
     + " : (() => {throw \"accessing non-existent var\";})())";
+}
+
+This.prototype.trans = function() {
+  return "this";
 }
 
