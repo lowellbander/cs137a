@@ -23,7 +23,7 @@ function trans(ast) {
 
 Program.prototype.trans = function() {
   var statements = "function Obj() {};\n"
-    + "Obj.prototype.init = () => {}\n";
+    + "Obj.prototype.init = () => {return this;}\n";
   statements += this.ss.map(statement => statement.trans()).join('\n');
 
   function last(arr) {
@@ -59,17 +59,14 @@ Var.prototype.trans = function() {
 }
 
 MethodDecl.prototype.trans = function() {
-  return this.C + ".prototype." + this.m + " = (" + this.xs.join(", ")
-    + ") => {" + this.ss.map(s => s.trans()).join("\n")
-    + ((this.m === "init") ? "return this;\n" : "") + "};";
+  return this.C + ".prototype." + this.m + " = function(" + this.xs.join(", ")
+    + ") {" + this.ss.map(s => s.trans()).join("\n") + "return this;};";
 }
 
 ClassDecl.prototype.trans = function() {
   var superProperties = classes[this.S].members;
   var ownProperties = this.xs.filter(x => !(superProperties.includes(x)));
-  return "function " + this.C + "("
-    + superProperties.concat(ownProperties).join(", ") + ") {\n"
-    + this.xs.map(x => "this." + x + " = " + x + ";\n").join("") + "}";
+  return "function " + this.C + "() {};";
 }
 
 Return.prototype.trans = function() {
