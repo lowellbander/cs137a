@@ -47,12 +47,13 @@ Program.prototype.trans = function() {
   return statements;
 }
 
-ExpStmt.prototype.trans = function() {
-  return this.e.trans() + ";";
+ExpStmt.prototype.trans = function(classname) {
+  return this.e.trans(classname) + ";";
 }
 
-BinOp.prototype.trans = function() {
-  return "(" + this.e1.trans() + " " + this.op + " " + this.e2.trans() + ")";
+BinOp.prototype.trans = function(classname) {
+  return "(" + this.e1.trans(classname) + " " + this.op + " "
+    + this.e2.trans(classname) + ")";
 }
 
 Lit.prototype.trans = function() {
@@ -61,20 +62,21 @@ Lit.prototype.trans = function() {
     : this.primValue.toString();
 }
 
-VarDecl.prototype.trans = function() {
-  return "var " + this.x + " = " + this.e.trans() + ";";
+VarDecl.prototype.trans = function(classname) {
+  return "var " + this.x + " = " + this.e.trans(classname) + ";";
 }
 
 Var.prototype.trans = function() {
   return this.x;
 }
 
-MethodDecl.prototype.trans = function() {
+MethodDecl.prototype.trans = function(classname) {
+  var that = this;
   return this.C + ".prototype." + this.m + " = function(" + this.xs.join(", ")
-    + ") {" + this.ss.map(s => s.trans()).join("\n") + "return this;};";
+    + ") {" + this.ss.map(s => s.trans(that.C)).join("\n") + "return this;};";
 }
 
-ClassDecl.prototype.trans = function() {
+ClassDecl.prototype.trans = function(classname) {
   // var superProperties = classes[this.S].members;
   // var ownProperties = this.xs.filter(x => !(superProperties.includes(x)));
 
@@ -83,22 +85,22 @@ ClassDecl.prototype.trans = function() {
     this.C + ".prototype = Object.create(" + this.S + ".prototype);";
 }
 
-Return.prototype.trans = function() {
-  return "return " + this.e.trans() + ";";
+Return.prototype.trans = function(classname) {
+  return "return " + this.e.trans(classname) + ";";
 }
 
-New.prototype.trans = function() {
+New.prototype.trans = function(classname) {
   return "(() => {var foo = new " + this.C + "(); foo.init("
-    + this.es.map(e => e.trans()).join(", ") +"); return foo;})()"
+    + this.es.map(e => e.trans(classname)).join(", ") +"); return foo;})()"
 }
 
-Send.prototype.trans = function() {
-  return this.erecv.trans() + "." + this.m
-    + "(" + this.es.map(s=>s.trans()).join(", ") + ")";
+Send.prototype.trans = function(classname) {
+  return this.erecv.trans(classname) + "." + this.m
+    + "(" + this.es.map(s=>s.trans(classname)).join(", ") + ")";
 }
 
-InstVarAssign.prototype.trans = function() {
-  return "this.m_" + this.x + " = " + this.e.trans() + ";";
+InstVarAssign.prototype.trans = function(classname) {
+  return "this.m_" + this.x + " = " + this.e.trans(classname) + ";";
 }
 
 InstVar.prototype.trans = function() {
@@ -109,5 +111,11 @@ InstVar.prototype.trans = function() {
 
 This.prototype.trans = function() {
   return "this";
+}
+
+SuperSend.prototype.trans = function(classname) {
+  var superclass = getSuper(classname);
+  return superclass + ".prototype." + this.m + ".call("
+    + ["this"].concat(this.es.map(s=>s.trans(classname))).join(", ") + ")";
 }
 
