@@ -1,32 +1,16 @@
 'use strict';
 
-var classes = {};
+var classHierarchy = {};
 
-class Class {
-  constructor(classname, superclass, members) {
-    if (!(typeof classname === "string")) throw "classname must be string";
-    if (!(typeof superclass === "string")) throw "superclass must be string";
-    if (!Array.isArray(members)) throw "members must be an array";
-    for (var m in members) {
-      if (!(typeof m === "string")) throw "members must be an array of strings";
-    }
-
-    this.classname = classname;
-    this.superclass = superclass;
-    this.members = members;
-  }
-}
-
-function addClass(classname, superclass, members) {
-  var newClass = new Class(classname, superclass, members);
-  classes[classname] = newClass;
+function addClass(classname, superclass) {
+  classHierarchy[classname] = superclass;
 }
 
 function getSuper(classname) {
-  return classes[classname].superclass;
+  return classHierarchy[classname];
 }
 
-addClass("Obj", "Obj", [])
+addClass("Obj", "Obj")
 
 function trans(ast) {
   return ast.trans();
@@ -77,10 +61,7 @@ MethodDecl.prototype.trans = function(classname) {
 }
 
 ClassDecl.prototype.trans = function(classname) {
-  // var superProperties = classes[this.S].members;
-  // var ownProperties = this.xs.filter(x => !(superProperties.includes(x)));
-
-  addClass(this.C, this.S, this.xs);
+  addClass(this.C, this.S);
   return "function " + this.C + "() {}; " +
     this.C + ".prototype = Object.create(" + this.S + ".prototype);";
 }
