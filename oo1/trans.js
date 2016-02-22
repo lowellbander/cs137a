@@ -64,8 +64,8 @@ MethodDecl.prototype.trans = function() {
 }
 
 ClassDecl.prototype.trans = function() {
-  var superProperties = classes[this.S].members;
-  var ownProperties = this.xs.filter(x => !(superProperties.includes(x)));
+ // var superProperties = classes[this.S].members;
+ // var ownProperties = this.xs.filter(x => !(superProperties.includes(x)));
   return "function " + this.C + "() {};";
 }
 
@@ -84,10 +84,10 @@ Send.prototype.trans = function() {
 }
 
 InstVarAssign.prototype.trans = function() {
-  return "this." + this.x + " = " + this.e.trans() + ";";
+  return "this.m_" + this.x + " = " + this.e.trans() + ";";
 }
 
 InstVar.prototype.trans = function() {
-  return "this." + this.x;
+  return "this.m_" + this.x;
 }
 
