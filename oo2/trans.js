@@ -17,9 +17,12 @@ function trans(ast) {
 }
 
 Program.prototype.trans = function() {
-  var statements = "function Obj() {};\n"
-    + "Obj.prototype.init = () => {return this;}\n";
-  statements += this.ss.map(statement => statement.trans()).join('\n');
+  var boilerplate = [];
+  boilerplate.push(new ClassDecl("Obj", "Obj", []));
+  boilerplate.push(new MethodDecl("Obj", "init", [], []));
+  this.ss.unshift(...boilerplate);
+
+  var statements = this.ss.map(statement => statement.trans()).join('\n');
 
   function last(arr) {
     if (!(arr instanceof Array)) throw "last expects an array";
