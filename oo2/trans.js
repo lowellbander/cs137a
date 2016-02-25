@@ -20,9 +20,15 @@ Program.prototype.trans = function() {
   var boilerplate = [];
   boilerplate.push(new ClassDecl("Obj", "Obj", []));
   boilerplate.push(new MethodDecl("Obj", "init", [], []));
+  boilerplate.push(new ClassDecl("Null", "Obj", []));
+  boilerplate.push(new ClassDecl("Num", "Obj", []));
+  boilerplate.push(new ClassDecl("Str", "Obj", []));
+  boilerplate.push(new ClassDecl("Bool", "Obj", []));
+  boilerplate.push(new ClassDecl("True", "Bool", []));
+  boilerplate.push(new ClassDecl("False", "Bool", []));
   this.ss.unshift(...boilerplate);
 
-  var statements = this.ss.map(statement => statement.trans()).join('\n');
+  var statements = this.ss.map(statement => statement.trans()).join("");
 
   function last(arr) {
     if (!(arr instanceof Array)) throw "last expects an array";
@@ -60,7 +66,7 @@ Var.prototype.trans = function() {
 MethodDecl.prototype.trans = function(classname) {
   var that = this;
   return this.C + ".prototype." + this.m + " = function(" + this.xs.join(", ")
-    + ") {" + this.ss.map(s => s.trans(that.C)).join("\n") + "return this;};";
+    + ") {" + this.ss.map(s => s.trans(that.C)).join("") + " return this;};";
 }
 
 ClassDecl.prototype.trans = function(classname) {
