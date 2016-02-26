@@ -16,18 +16,30 @@ function trans(ast) {
   return ast.trans();
 }
 
-Program.prototype.trans = function() {
-  var boilerplate = [];
-  boilerplate.push(new ClassDecl("Obj", "Obj", []));
-  boilerplate.push(new MethodDecl("Obj", "init", [], []));
-  boilerplate.push(new ClassDecl("Null", "Obj", []));
-  boilerplate.push(new ClassDecl("Num", "Obj", []));
-  boilerplate.push(new ClassDecl("Str", "Obj", []));
-  boilerplate.push(new ClassDecl("Bool", "Obj", []));
-  boilerplate.push(new ClassDecl("True", "Bool", []));
-  boilerplate.push(new ClassDecl("False", "Bool", []));
-  this.ss.unshift(...boilerplate);
+function Obj() {};
+Obj.prototype.init = function() {
+      return this;
+};
 
+function Null() {};
+Null.prototype = Object.create(Obj.prototype);
+
+function Num() {};
+Num.prototype = Object.create(Obj.prototype);
+
+function Str() {};
+Str.prototype = Object.create(Obj.prototype);
+
+function Bool() {};
+Bool.prototype = Object.create(Obj.prototype);
+
+function True() {};
+True.prototype = Object.create(Bool.prototype);
+
+function False() {};
+False.prototype = Object.create(Bool.prototype);
+
+Program.prototype.trans = function() {
   var statements = this.ss.map(statement => statement.trans()).join("");
 
   function last(arr) {
