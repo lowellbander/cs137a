@@ -21,11 +21,32 @@ Obj.prototype.init = function() {
       return this;
 };
 
+function Boxed() {};
+Boxed.prototype.unbox = function() {
+  return this.m_x;
+}
+
 function Null() {};
 Null.prototype = Object.create(Obj.prototype);
 
 function Num() {};
-Num.prototype = Object.create(Obj.prototype);
+Num.prototype = Object.create(Boxed.prototype);
+Num.prototype.init = function (x) {this.m_x = x;};
+Num.prototype["*"] = function (other) {
+  var n = new Num();
+  var product = this.m_x * other.m_x;
+  n.init(product);
+  return n;
+}
+Num.prototype["+"] = function (other) {
+  var n = new Num();
+  var sum = this.m_x + other.m_x;
+  n.init(sum);
+  return n;
+}
+Num.prototype.unbox = function() {
+  return this.m_x;
+}
 
 function Str() {};
 Str.prototype = Object.create(Obj.prototype);
@@ -39,6 +60,12 @@ True.prototype = Object.create(Bool.prototype);
 function False() {};
 False.prototype = Object.create(Bool.prototype);
 
+function addUnboxing(str) {
+  var arr = str.split(";");
+  arr[arr.length - 2] += ".unbox()";
+  return arr.join(";");
+}
+
 Program.prototype.trans = function() {
   var statements = this.ss.map(statement => statement.trans()).join("");
 
@@ -47,9 +74,9 @@ Program.prototype.trans = function() {
     return (arr.length === 0) ? null : arr[arr.length - 1];
   }
 
-  if (!(last(this.ss) instanceof ExpStmt)) statements += "null;";
-
-  return statements;
+  return (last(this.ss) instanceof ExpStmt)
+    ? addUnboxing(statements)
+    : statements + "null;";
 }
 
 ExpStmt.prototype.trans = function(classname) {
@@ -57,11 +84,17 @@ ExpStmt.prototype.trans = function(classname) {
 }
 
 BinOp.prototype.trans = function(classname) {
-  return "(" + this.e1.trans(classname) + " " + this.op + " "
-    + this.e2.trans(classname) + ")";
+  return "(" + this.e1.trans(classname) + "[\"" + this.op + "\"]("
+    + this.e2.trans(classname) + "))";
 }
 
 Lit.prototype.trans = function() {
+  switch (typeof this.primValue) {
+    case "number":
+      return "((_ => {var foo = new Num(); foo.init(" + this.primValue
+        + "); return foo;})())";
+      debugger;
+  }
   return (typeof this.primValue === "string")
     ? "\"" + this.primValue + "\""
     : this.primValue.toString();

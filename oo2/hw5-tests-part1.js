@@ -2,9 +2,19 @@
 
 tests(O,
   {
-    name: 'BinOps should still work',
+    name: 'BinOps should still work (*)',
     code: '6 * 7',
     expected: 42
+  },
+  {
+    name: 'BinOps should still work (+)',
+    code: '6 + 7',
+    expected: 13
+  },
+  {
+    name: 'BinOps should still work (++)',
+    code: '(1 + 2) + 3',
+    expected: 6
   },
   {
     name: 'a number is a Num',
