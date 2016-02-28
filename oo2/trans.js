@@ -88,7 +88,27 @@ BinOp.prototype.trans = function(classname) {
     + this.e2.trans(classname) + "))";
 }
 
+function getClassnameForPrimitive(primitive) {
+  switch(typeof primitive) {
+    case "number":
+      return Num.name;
+    default:
+      throw "unsupported primitive: " + primitive;
+  }
+}
+
 Lit.prototype.trans = function() {
+
+  var classname = getClassnameForPrimitive(this.primValue);
+
+  switch (classname) {
+    case Num.name:
+      return "create(" + [Num.name].concat([this.primValue]).join(",") + ")";
+    default:
+      throw "unsupported primitive: " + this.primValue;
+  }
+
+
   switch (typeof this.primValue) {
     case "number":
       return "((_ => {var foo = new Num(); foo.init(" + this.primValue
@@ -124,7 +144,15 @@ Return.prototype.trans = function(classname) {
   return "return " + this.e.trans(classname) + ";";
 }
 
+function create(classname, ...args) {
+  var foo =  new classname();
+  foo.init(...args);
+  return foo;
+}
+
 New.prototype.trans = function(classname) {
+  return "create("
+    + [this.C].concat(this.es.map(e=>e.trans(classname))).join(",") + ")";
   return "(() => {var foo = new " + this.C + "(); foo.init("
     + this.es.map(e => e.trans(classname)).join(", ") +"); return foo;})()"
 }
