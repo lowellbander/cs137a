@@ -16,14 +16,37 @@ function trans(ast) {
   return ast.trans();
 }
 
+function create(classname, ...args) {
+  var foo =  new classname();
+  foo.init(...args);
+  return foo;
+}
+
 function Obj() {};
 Obj.prototype.init = function() {
       return this;
 };
 
 function Boxed() {};
+Boxed.prototype.init = function (x) {this.m_x = x;};
 Boxed.prototype.unbox = function() {
   return this.m_x;
+}
+
+function getType(lhs, rhs) {
+  if (lhs instanceof Num && rhs instanceof Num) {
+    return Num;
+  } else {
+    throw "unsupported or unmatching primitives: " + lhs + " " + rhs;
+  }
+}
+
+Boxed.prototype["+"] = function (other) {
+  return create(getType(this, other), this.m_x + other.m_x);
+}
+
+Boxed.prototype["*"] = function (other) {
+  return create(getType(this, other), this.m_x * other.m_x);
 }
 
 function Null() {};
@@ -31,19 +54,7 @@ Null.prototype = Object.create(Obj.prototype);
 
 function Num() {};
 Num.prototype = Object.create(Boxed.prototype);
-Num.prototype.init = function (x) {this.m_x = x;};
-Num.prototype["*"] = function (other) {
-  var n = new Num();
-  var product = this.m_x * other.m_x;
-  n.init(product);
-  return n;
-}
-Num.prototype["+"] = function (other) {
-  var n = new Num();
-  var sum = this.m_x + other.m_x;
-  n.init(sum);
-  return n;
-}
+
 Num.prototype.unbox = function() {
   return this.m_x;
 }
@@ -142,12 +153,6 @@ ClassDecl.prototype.trans = function(classname) {
 
 Return.prototype.trans = function(classname) {
   return "return " + this.e.trans(classname) + ";";
-}
-
-function create(classname, ...args) {
-  var foo =  new classname();
-  foo.init(...args);
-  return foo;
 }
 
 New.prototype.trans = function(classname) {
