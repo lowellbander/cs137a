@@ -107,10 +107,14 @@ function getClassnameForPrimitive(primitive) {
   switch(typeof primitive) {
     case "number":
       return Num.name;
+    case "string":
+      return Str.name;
     default:
       throw "unsupported primitive: " + primitive;
   }
 }
+
+var quoteWrap = str => "\"" + str + "\"";
 
 Lit.prototype.trans = function() {
 
@@ -118,7 +122,9 @@ Lit.prototype.trans = function() {
 
   switch (classname) {
     case Num.name:
-      return "create(" + [Num.name].concat([this.primValue]).join(",") + ")";
+      return "create(" + [Num.name, this.primValue].join(",") + ")";
+    case Str.name:
+      return "create(" + [Num.name, quoteWrap(this.primValue)].join(",") + ")";
     default:
       throw "unsupported primitive: " + this.primValue;
   }
