@@ -174,7 +174,8 @@ Var.prototype.trans = function() {
 
 MethodDecl.prototype.trans = function(classname) {
   var that = this;
-  return this.C + ".prototype." + this.m + " = function(" + this.xs.join(", ")
+  return this.C + ".prototype[\"" + this.m
+    + "\"] = function(" + this.xs.join(", ")
     + ") {" + this.ss.map(s => s.trans(that.C)).join("") + " return this;};";
 }
 
