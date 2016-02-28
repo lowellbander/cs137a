@@ -138,8 +138,11 @@ function getClassForPrimitive(primitive) {
       return Str;
     case "boolean":
       return Bool;
-    default:
-      throw "unsupported primitive: " + primitive;
+  }
+  if (primitive === null) {
+    return Null;
+  } else {
+    throw "unsupported primitive: " + primitive;
   }
 }
 
@@ -149,11 +152,13 @@ Lit.prototype.trans = function() {
   var c = getClassForPrimitive(this.primValue);
   switch (c.name) {
     case Num.name:
-      return "create(" + [Num.name, this.primValue].join(",") + ")";
+      return "create(" + [c.name, this.primValue].join(",") + ")";
     case Str.name:
-      return "create(" + [Str.name, quoteWrap(this.primValue)].join(",") + ")";
+      return "create(" + [c.name, quoteWrap(this.primValue)].join(",") + ")";
     case Bool.name:
-      return "create(" + [(this.primValue) ? "True" : "False"] +")";
+      return "create(" + ((this.primValue) ? "True" : "False") +")";
+    case Null.name:
+      return "create(" + c.name + ")";
     default:
       throw "unsupported primitive: " + this.primValue;
   }
