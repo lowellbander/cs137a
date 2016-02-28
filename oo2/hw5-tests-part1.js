@@ -18,7 +18,7 @@ tests(O,
   },
   {
     name: 'BinOps should still work (/)',
-    code: '4 - 2',
+    code: '4 / 2',
     expected: 2
   },
   {
@@ -50,11 +50,6 @@ tests(O,
     name: 'BinOps should still work (!=)',
     code: '4 != 2',
     expected: true
-  },
-  {
-    name: 'unmatched types errors',
-    code: '4 - \"foo\"',
-    shouldThrow: true
   },
   {
     name: 'BinOps should still work (++)',

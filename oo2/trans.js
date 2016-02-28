@@ -33,34 +33,29 @@ Boxed.prototype.unbox = function() {
   return this.m_x;
 }
 
-function getType(lhs, rhs) {
-  if (lhs instanceof Num && rhs instanceof Num) {
-    return Num;
-  } else if (lhs instanceof Str && rhs instanceof Str) {
-    return Str;
-  } else {
-    throw "unsupported or unmatching primitives: " + lhs + " " + rhs;
-  }
-}
-
 Boxed.prototype["+"] = function (other) {
-  return create(getType(this, other), this.m_x + other.m_x);
+  var result = this.m_x + other.m_x;
+  return create(getClassForPrimitive(result), result);
 }
 
 Boxed.prototype["-"] = function (other) {
-  return create(getType(this, other), this.m_x - other.m_x);
+  var result = this.m_x - other.m_x;
+  return create(getClassForPrimitive(result), result);
 }
 
 Boxed.prototype["*"] = function (other) {
-  return create(getType(this, other), this.m_x * other.m_x);
+  var result = this.m_x * other.m_x;
+  return create(getClassForPrimitive(result), result);
 }
 
 Boxed.prototype["/"] = function (other) {
-  return create(getType(this, other), this.m_x / other.m_x);
+  var result = this.m_x / other.m_x;
+  return create(getClassForPrimitive(result), result);
 }
 
 Boxed.prototype["%"] = function (other) {
-  return create(getType(this, other), this.m_x % other.m_x);
+  var result = this.m_x % other.m_x;
+  return create(getClassForPrimitive(result), result);
 }
 
 Boxed.prototype["<"] = function (other) {
@@ -135,12 +130,14 @@ BinOp.prototype.trans = function(classname) {
     + this.e2.trans(classname) + "))";
 }
 
-function getClassnameForPrimitive(primitive) {
+function getClassForPrimitive(primitive) {
   switch(typeof primitive) {
     case "number":
-      return Num.name;
+      return Num;
     case "string":
-      return Str.name;
+      return Str;
+    case "boolean":
+      return Bool;
     default:
       throw "unsupported primitive: " + primitive;
   }
@@ -149,12 +146,14 @@ function getClassnameForPrimitive(primitive) {
 var quoteWrap = str => "\"" + str + "\"";
 
 Lit.prototype.trans = function() {
-  var classname = getClassnameForPrimitive(this.primValue);
-  switch (classname) {
+  var c = getClassForPrimitive(this.primValue);
+  switch (c.name) {
     case Num.name:
       return "create(" + [Num.name, this.primValue].join(",") + ")";
     case Str.name:
       return "create(" + [Str.name, quoteWrap(this.primValue)].join(",") + ")";
+    case Bool.name:
+      return "create(" + [(this.primValue) ? "True" : "False"] +")";
     default:
       throw "unsupported primitive: " + this.primValue;
   }
