@@ -36,6 +36,8 @@ Boxed.prototype.unbox = function() {
 function getType(lhs, rhs) {
   if (lhs instanceof Num && rhs instanceof Num) {
     return Num;
+  } else if (lhs instanceof Str && rhs instanceof Str) {
+    return Str;
   } else {
     throw "unsupported or unmatching primitives: " + lhs + " " + rhs;
   }
@@ -53,8 +55,32 @@ Boxed.prototype["*"] = function (other) {
   return create(getType(this, other), this.m_x * other.m_x);
 }
 
+Boxed.prototype["/"] = function (other) {
+  return create(getType(this, other), this.m_x / other.m_x);
+}
+
+Boxed.prototype["%"] = function (other) {
+  return create(getType(this, other), this.m_x % other.m_x);
+}
+
+Boxed.prototype["<"] = function (other) {
+  return (this.m_x < other.m_x) ? new True() : new False();
+}
+
+Boxed.prototype[">"] = function (other) {
+  return (this.m_x > other.m_x) ? new True() : new False();
+}
+
+Boxed.prototype["=="] = function (other) {
+  return (this.m_x == other.m_x) ? new True() : new False();
+}
+
+Boxed.prototype["!="] = function (other) {
+  return (this.m_x != other.m_x) ? new True() : new False();
+}
+
 function Null() {};
-Null.prototype = Object.create(Obj.prototype);
+Null.prototype = Object.create(Boxed.prototype);
 
 function Num() {};
 Num.prototype = Object.create(Boxed.prototype);
@@ -64,16 +90,22 @@ Num.prototype.unbox = function() {
 }
 
 function Str() {};
-Str.prototype = Object.create(Obj.prototype);
+Str.prototype = Object.create(Boxed.prototype);
 
 function Bool() {};
-Bool.prototype = Object.create(Obj.prototype);
+Bool.prototype = Object.create(Boxed.prototype);
 
 function True() {};
 True.prototype = Object.create(Bool.prototype);
+True.prototype.unbox = function() {
+  return true;
+}
 
 function False() {};
 False.prototype = Object.create(Bool.prototype);
+False.prototype.unbox = function() {
+  return false;
+}
 
 function addUnboxing(str) {
   var arr = str.split(";");
@@ -117,28 +149,15 @@ function getClassnameForPrimitive(primitive) {
 var quoteWrap = str => "\"" + str + "\"";
 
 Lit.prototype.trans = function() {
-
   var classname = getClassnameForPrimitive(this.primValue);
-
   switch (classname) {
     case Num.name:
       return "create(" + [Num.name, this.primValue].join(",") + ")";
     case Str.name:
-      return "create(" + [Num.name, quoteWrap(this.primValue)].join(",") + ")";
+      return "create(" + [Str.name, quoteWrap(this.primValue)].join(",") + ")";
     default:
       throw "unsupported primitive: " + this.primValue;
   }
-
-
-  switch (typeof this.primValue) {
-    case "number":
-      return "((_ => {var foo = new Num(); foo.init(" + this.primValue
-        + "); return foo;})())";
-      debugger;
-  }
-  return (typeof this.primValue === "string")
-    ? "\"" + this.primValue + "\""
-    : this.primValue.toString();
 }
 
 VarDecl.prototype.trans = function(classname) {
@@ -168,8 +187,6 @@ Return.prototype.trans = function(classname) {
 New.prototype.trans = function(classname) {
   return "create("
     + [this.C].concat(this.es.map(e=>e.trans(classname))).join(",") + ")";
-  return "(() => {var foo = new " + this.C + "(); foo.init("
-    + this.es.map(e => e.trans(classname)).join(", ") +"); return foo;})()"
 }
 
 Send.prototype.trans = function(classname) {

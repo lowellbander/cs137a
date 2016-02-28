@@ -17,6 +17,46 @@ tests(O,
     expected: -1
   },
   {
+    name: 'BinOps should still work (/)',
+    code: '4 - 2',
+    expected: 2
+  },
+  {
+    name: 'BinOps should still work (%)',
+    code: '4 % 2',
+    expected: 0
+  },
+  {
+    name: 'BinOps should still work (<)',
+    code: '4 < 2',
+    expected: false
+  },
+  {
+    name: 'BinOps should still work (>)',
+    code: '4 > 2',
+    expected: true
+  },
+  {
+    name: 'BinOps should still work (==)',
+    code: '4 == 2',
+    expected: false
+  },
+  {
+    name: 'BinOps should still work (== str)',
+    code: '\"str\" == \"str\"',
+    expected: true
+  },
+  {
+    name: 'BinOps should still work (!=)',
+    code: '4 != 2',
+    expected: true
+  },
+  {
+    name: 'unmatched types errors',
+    code: '4 - \"foo\"',
+    shouldThrow: true
+  },
+  {
     name: 'BinOps should still work (++)',
     code: '(1 + 2) + 3',
     expected: 6
