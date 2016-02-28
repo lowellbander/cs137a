@@ -45,6 +45,10 @@ Boxed.prototype["+"] = function (other) {
   return create(getType(this, other), this.m_x + other.m_x);
 }
 
+Boxed.prototype["-"] = function (other) {
+  return create(getType(this, other), this.m_x - other.m_x);
+}
+
 Boxed.prototype["*"] = function (other) {
   return create(getType(this, other), this.m_x * other.m_x);
 }

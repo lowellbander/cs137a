@@ -12,6 +12,11 @@ tests(O,
     expected: 13
   },
   {
+    name: 'BinOps should still work (-)',
+    code: '6 - 7',
+    expected: -1
+  },
+  {
     name: 'BinOps should still work (++)',
     code: '(1 + 2) + 3',
     expected: 6
