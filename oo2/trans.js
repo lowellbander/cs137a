@@ -183,6 +183,9 @@ Var.prototype.trans = function() {
 
 MethodDecl.prototype.trans = function(classname) {
   var that = this;
+  if (last(this.ss) instanceof ExpStmt) {
+    this.ss.splice(this.ss.length - 1, 1, new Return(last(this.ss)));
+  }
   return this.C + ".prototype[\"" + this.m
     + "\"] = function(" + this.xs.join(", ")
     + ") {" + this.ss.map(s => s.trans(that.C)).join("") + " return this;};";
