@@ -27,6 +27,16 @@ Obj.prototype.init = function() {
       return this;
 };
 
+function Block() {};
+Block.prototype = Object.create(Obj.prototype);
+Block.prototype.init = function(fun) {
+  this.fun = fun;
+  return this;
+};
+Block.prototype.call = function (...args) {
+  return this.fun(...args);
+}
+
 function Boxed() {};
 Boxed.prototype.init = function (x) {this.m_x = x;};
 Boxed.prototype.unbox = function() {
@@ -108,14 +118,13 @@ function addUnboxing(str) {
   return arr.join(";");
 }
 
+function last(arr) {
+  if (!(arr instanceof Array)) throw "last expects an array";
+  return (arr.length === 0) ? null : arr[arr.length - 1];
+}
+
 Program.prototype.trans = function() {
   var statements = this.ss.map(statement => statement.trans()).join("");
-
-  function last(arr) {
-    if (!(arr instanceof Array)) throw "last expects an array";
-    return (arr.length === 0) ? null : arr[arr.length - 1];
-  }
-
   return (last(this.ss) instanceof ExpStmt)
     ? addUnboxing(statements)
     : statements + "null;";
@@ -197,6 +206,16 @@ New.prototype.trans = function(classname) {
 Send.prototype.trans = function(classname) {
   return this.erecv.trans(classname) + "." + this.m
     + "(" + this.es.map(s=>s.trans(classname)).join(", ") + ")";
+}
+
+BlockLit.prototype.trans = function(classname) {
+  if (last(this.ss) instanceof ExpStmt) {
+    this.ss.splice(this.ss.length - 1, 1, new Return(last(this.ss)));
+  }
+  return "create(Block, "
+    + "(" + this.xs + ") => {"
+    + this.ss.map(s => s.trans())
+    + "})";
 }
 
 InstVarAssign.prototype.trans = function(classname) {

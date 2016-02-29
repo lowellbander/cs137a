@@ -2,6 +2,16 @@
 
 tests(O,
   {
+    name: 'simple argless',
+    code: '{123}.call()',
+    expected: 123
+  },
+  {
+    name: 'simple arg\'d',
+    code: '{x | 123}.call()',
+    expected: 123
+  },
+  {
     name: 'thenElse (1/2)',
     code: 'def True then: tb else: fb = tb.call();\n' +
           'def False then: tb else: fb = fb.call();\n' +
