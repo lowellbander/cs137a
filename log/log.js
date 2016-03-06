@@ -3,8 +3,22 @@
 //         {Clause, Var}.prototype.rewrite(subst)
 // -----------------------------------------------------------------------------
 
+function tag(name) {
+  return name += "foo";
+}
+
+function freshen(term) {
+  if (term instanceof Clause) {
+    return new Clause(term.name, term.args.map(t => freshen(t)));
+  } else if (term instanceof Var) {
+    return new Var(tag(term.name));
+  } else {
+    throw "error in freshen";
+  }
+}
+
 Rule.prototype.makeCopyWithFreshVarNames = function() {
-  throw new TODO('Rule.prototype.makeCopyWithFreshVarNames not implemented');
+  return new Rule(freshen(this.head), this.body.map(t => freshen(t)));
 };
 
 Clause.prototype.rewrite = function(subst) {
