@@ -13,7 +13,7 @@ function freshen(term) {
   } else if (term instanceof Var) {
     return new Var(tag(term.name));
   } else {
-    throw "error in freshen";
+    throw "a term must either be a clause or a variable";
   }
 }
 
