@@ -3,22 +3,22 @@
 //         {Clause, Var}.prototype.rewrite(subst)
 // -----------------------------------------------------------------------------
 
-function tag(name) {
-  return name += "foo";
+function Term() {};
+Term.prototype = Object.create(AST.prototype);
+Var.prototype = Object.create(Term.prototype);
+Clause.prototype = Object.create(Term.prototype);
+
+Var.prototype.freshen = function() {
+  var tag = name => name + "foo";
+  return new Var(tag(this.name));
 }
 
-function freshen(term) {
-  if (term instanceof Clause) {
-    return new Clause(term.name, term.args.map(t => freshen(t)));
-  } else if (term instanceof Var) {
-    return new Var(tag(term.name));
-  } else {
-    throw "a term must either be a clause or a variable";
-  }
+Clause.prototype.freshen = function() {
+  return new Clause(this.name, this.args.map(t => t.freshen()));
 }
 
 Rule.prototype.makeCopyWithFreshVarNames = function() {
-  return new Rule(freshen(this.head), this.body.map(t => freshen(t)));
+  return new Rule(this.head.freshen(), this.body.map(t => t.freshen()));
 };
 
 Clause.prototype.copy = function() {
