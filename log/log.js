@@ -25,8 +25,13 @@ Clause.prototype.rewrite = function(subst) {
   throw new TODO('Clause.prototype.rewrite not implemented');
 };
 
+Var.prototype.copy = function() {
+  return new Var(this.name);
+}
+
 Var.prototype.rewrite = function(subst) {
-  throw new TODO('Var.prototype.rewrite not implemented');
+  var binding = subst.lookup(this.name);
+  return (binding !== undefined) ? binding : this.copy();
 };
 
 // -----------------------------------------------------------------------------
