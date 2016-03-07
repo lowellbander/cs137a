@@ -21,8 +21,14 @@ Rule.prototype.makeCopyWithFreshVarNames = function() {
   return new Rule(freshen(this.head), this.body.map(t => freshen(t)));
 };
 
+Clause.prototype.copy = function() {
+  return new Clause(this.name, this.args);
+}
+
 Clause.prototype.rewrite = function(subst) {
-  throw new TODO('Clause.prototype.rewrite not implemented');
+  return (this.args.length === 0)
+    ? this.copy()
+    : new Clause(this.name, this.args.map(t => t.rewrite(subst)));
 };
 
 Var.prototype.copy = function() {
