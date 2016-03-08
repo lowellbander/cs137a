@@ -54,6 +54,14 @@ tests(
                          .bind("Y", new Clause("a", []))
   },
   {
+    name: 'unify(Clause, Clause) solvedForm',
+    code: 'new Subst().unify(new Clause("f", [new Var("Z"), new Var("X"), new Var("Y")]),\n' +
+          '                  new Clause("f", [new Var("Y"), new Clause("a", []), new Var("X")]));',
+    expected: new Subst().bind("X", new Clause("a", []))
+                         .bind("Y", new Clause("a", []))
+                         .bind("Z", new Clause("a", []))
+  },
+  {
     name: 'unify(Clause, Clause) diff lengths',
     code: 'new Subst().unify(new Clause("f", [new Var("X")]),\n' +
           '                  new Clause("f", [new Clause("a", []), new Var("X")]));',

@@ -95,7 +95,6 @@ Subst.prototype.unify = function(term1, term2) {
   } else {
     throw "a term is either a clause or a variable";
   }
-  // TODO: does this need to be done until we reach the fixed point?
   return this.solvedForm();
 };
 
