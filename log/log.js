@@ -44,12 +44,37 @@ Var.prototype.rewrite = function(subst) {
 // Part II: Subst.prototype.unify(term1, term2)
 // -----------------------------------------------------------------------------
 
-var invariant = (condition, message) => {if (!condition) throw message};
+function invariant(condition, message) {
+  if (message === undefined) message === "invariant violation";
+  if (!condition) throw message;
+}
+
+function first(arr) {
+  invariant(arr instanceof Array);
+  return (arr.length === 0) ? null : arr[0];
+}
+
+function second(arr) {
+  invariant(arr instanceof Array);
+  invariant(arr.length >= 2);
+  return arr[1];
+}
+
+function rest(arr) {
+  invariant(arr instanceof Array);
+  return arr.slice(1);
+}
+
+function zip(arr1, arr2) {
+  invariant(arr1.length === arr2.length, "differing args length");
+  return (arr1.length === 0)
+    ? []
+    : [[first(arr1), first(arr2)]].concat(zip(rest(arr1), rest(arr2)));
+}
 
 Subst.prototype.unify = function(term1, term2) {
   // TODO: ensure result is in solved form (variables in domain not in range)
   // TODO: occurs check? is this the same thing?
-  debugger;
   if (__equals__(term1, term2)) {
     return this;
   } else if (term1 instanceof Var) {
@@ -57,9 +82,9 @@ Subst.prototype.unify = function(term1, term2) {
   } else if (term2 instanceof Var) {
     return this.bind(term2.name, term1);
   } else if (term1 instanceof Clause && term2 instanceof Clause) {
-    // zip the args, map on the list.
-    invariant(term1.args.length === term2.args.length, "differing args length");
-    throw "not done yet";
+    invariant(term1.name === term2.name, "clauses with diff names cant unify");
+    zip(term1.args, term2.args).map(t => this.unify(first(t), second(t)));
+    return this;
   } else {
     throw "a term is either a clause or a variable";
   }
