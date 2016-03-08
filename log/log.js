@@ -72,22 +72,31 @@ function zip(arr1, arr2) {
     : [[first(arr1), first(arr2)]].concat(zip(rest(arr1), rest(arr2)));
 }
 
+Subst.prototype.solvedForm = function() {
+  for (var key in this.bindings) {
+    this.bind(key, this.lookup(key).rewrite(this))
+  }
+  return this;
+}
+
 Subst.prototype.unify = function(term1, term2) {
   // TODO: ensure result is in solved form (variables in domain not in range)
   // TODO: occurs check? is this the same thing?
+  // TODO: check against multiple bindings to same variable
   if (__equals__(term1, term2)) {
     return this;
   } else if (term1 instanceof Var) {
-    return this.bind(term1.name, term2);
+    this.bind(term1.name, term2);
   } else if (term2 instanceof Var) {
-    return this.bind(term2.name, term1);
+    this.bind(term2.name, term1);
   } else if (term1 instanceof Clause && term2 instanceof Clause) {
     invariant(term1.name === term2.name, "clauses with diff names cant unify");
     zip(term1.args, term2.args).map(t => this.unify(first(t), second(t)));
-    return this;
   } else {
     throw "a term is either a clause or a variable";
   }
+  // TODO: does this need to be done until we reach the fixed point?
+  return this.solvedForm();
 };
 
 // -----------------------------------------------------------------------------
