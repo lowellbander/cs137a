@@ -44,8 +44,25 @@ Var.prototype.rewrite = function(subst) {
 // Part II: Subst.prototype.unify(term1, term2)
 // -----------------------------------------------------------------------------
 
+var invariant = (condition, message) => {if (!condition) throw message};
+
 Subst.prototype.unify = function(term1, term2) {
-  throw new TODO('Subst.prototype.unify not implemented');
+  // TODO: ensure result is in solved form (variables in domain not in range)
+  // TODO: occurs check? is this the same thing?
+  debugger;
+  if (__equals__(term1, term2)) {
+    return this;
+  } else if (term1 instanceof Var) {
+    return this.bind(term1.name, term2);
+  } else if (term2 instanceof Var) {
+    return this.bind(term2.name, term1);
+  } else if (term1 instanceof Clause && term2 instanceof Clause) {
+    // zip the args, map on the list.
+    invariant(term1.args.length === term2.args.length, "differing args length");
+    throw "not done yet";
+  } else {
+    throw "a term is either a clause or a variable";
+  }
 };
 
 // -----------------------------------------------------------------------------
