@@ -84,13 +84,17 @@ Subst.prototype.unify = function(term1, term2) {
   if (__equals__(term1, term2)) {
     return this;
   } else if (term1 instanceof Var) {
-  // TODO: check against multiple bindings to same variable
+  // TODO: check against multiple bindings to same variable, throw
     this.bind(term1.name, term2);
   } else if (term2 instanceof Var) {
     this.bind(term2.name, term1);
   } else if (term1 instanceof Clause && term2 instanceof Clause) {
-    invariant(term1.name === term2.name, "clauses with diff names cant unify");
-    zip(term1.args, term2.args).map(t => this.unify(first(t), second(t)));
+    //invariant(term1.name === term2.name, "unification failed");
+    if (term1.name !== term2.name) {
+      throw "unification failed";
+    } else {
+      zip(term1.args, term2.args).map(t => this.unify(first(t), second(t)));
+    }
   } else {
     throw "a term is either a clause or a variable";
   }
