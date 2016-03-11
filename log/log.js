@@ -105,7 +105,30 @@ Subst.prototype.unify = function(term1, term2) {
 // Part III: Program.prototype.solve()
 // -----------------------------------------------------------------------------
 
+var head = arr => first(arr);
+var tail = arr => rest(arr);
+
+function solve(ontology, rules, goals, substitutions) {
+  if (goals.length === 0) return substitutions;
+  if (rules.length === 0) return null;
+
+  try {
+    substitutions = substitutions.unify(head(rules).head, head(goals));
+  } catch (e) {
+    return solve(ontology, tail(rules), goals, substitutions);
+  }
+
+  goals.pop();
+  head(rules).body.map(c => goals.push(c));
+
+  return solve(ontology, ontology, goals, substitutions);
+}
+
 Program.prototype.solve = function() {
+  debugger;
+  return makeIterator(solve(this.rules, this.rules, this.query, new Subst()));
+  // try to unify the goal (this.query) with the knowledgeBase (this.rules)
+  // TODO: how does this work for a query with multiple terms?
   throw new TODO('Program.prototype.solve not implemented');
 };
 
