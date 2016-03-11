@@ -54,6 +54,39 @@ tests(
                          .bind("Y", new Clause("a", []))
   },
   {
+    name: 'unify(Clause, Clause) X->a, X->b',
+    code: 'new Subst().unify(new Clause("f", [new Var("X"), new Var("X")]),\n' +
+          '                  new Clause("f", [new Clause("a", []), new Clause("b", [])]));',
+    shouldThrow: true
+  },
+  {
+    name: 'unify(Clause, Clause) X->a[a,b], X->a[b,a]',
+    code: 'new Subst().unify(new Clause("f", [new Var("X"), new Var("X")]),\n' +
+          '                  new Clause("f", [new Clause("a", [new Clause("a", []), new Clause("b", [])]), new Clause("a", [new Clause("b", []), new Clause("a", [])])]));',
+    shouldThrow: true
+  },
+  {
+    name: 'unify(Clause, Clause) X->a[Y,b], X->a[b,a]',
+    code: 'new Subst().unify(new Clause("f", [new Var("X"), new Var("X")]),\n' +
+          '                  new Clause("f", [new Clause("a", [new Var("Y"), new Clause("b", [])]), new Clause("a", [new Clause("b", []), new Clause("a", [])])]));',
+    expected: new Subst().bind("X", new Clause("a", [new Clause("b", []), new Clause("a", [])]))
+                         .bind("Y", new Clause("b", []))
+  },
+  {
+    name: 'unify(Clause, Clause) X->a, X->Y',
+    code: 'new Subst().unify(new Clause("f", [new Var("X"), new Var("X")]),\n' +
+          '                  new Clause("f", [new Clause("a", []), new Var("Y")]));',
+    expected: new Subst().bind("X", new Clause("a", []))
+                         .bind("Y", new Clause("a", []))
+  },
+  {
+    name: 'unify(Clause, Clause) X->a, Y->X',
+    code: 'new Subst().unify(new Clause("f", [new Var("X"), new Var("Y")]),\n' +
+          '                  new Clause("f", [new Clause("a", []), new Var("X")]));',
+    expected: new Subst().bind("X", new Clause("a", []))
+                         .bind("Y", new Clause("a", []))
+  },
+  {
     name: 'unify(Clause, Clause) solvedForm',
     code: 'new Subst().unify(new Clause("f", [new Var("Z"), new Var("X"), new Var("Y")]),\n' +
           '                  new Clause("f", [new Var("Y"), new Clause("a", []), new Var("X")]));',

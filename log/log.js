@@ -80,12 +80,11 @@ Subst.prototype.solvedForm = function() {
 }
 
 Subst.prototype.unify = function(term1, term2) {
-  // TODO: ensure result is in solved form (variables in domain not in range)
   // TODO: occurs check? is this the same thing?
-  // TODO: check against multiple bindings to same variable
   if (__equals__(term1, term2)) {
     return this;
   } else if (term1 instanceof Var) {
+  // TODO: check against multiple bindings to same variable
     this.bind(term1.name, term2);
   } else if (term2 instanceof Var) {
     this.bind(term2.name, term1);
